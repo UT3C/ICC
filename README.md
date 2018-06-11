@@ -6,162 +6,148 @@ elif a>0:
  print("Tu numero es positivo")
 elif a==0:
  print("Tu numero es 0")
-// A C++ program to demonstrate common Binary Heap Operations
-#include<iostream>
-#include<climits>
-using namespace std;
 
-// Prototype of a utility function to swap two integers
-void swap(int *x, int *y);
+##other
+import java.util.ArrayList;
 
-// A class for Min Heap
-class MinHeap
-{
-	int *harr; // pointer to array of elements in heap
-	int capacity; // maximum possible size of min heap
-	int heap_size; // Current number of elements in min heap
-public:
-	// Constructor
-	MinHeap(int capacity);
+public class MinHeap {
 
-	// to heapify a subtree with the root at given index
-	void MinHeapify(int );
+    private ArrayList<Integer> list;
 
-	int parent(int i) { return (i-1)/2; }
+    public MinHeap() {
 
-	// to get index of left child of node at index i
-	int left(int i) { return (2*i + 1); }
+        this.list = new ArrayList<Integer>();
+    }
 
-	// to get index of right child of node at index i
-	int right(int i) { return (2*i + 2); }
+    public MinHeap(ArrayList<Integer> items) {
 
-	// to extract the root which is the minimum element
-	int extractMin();
+        this.list = items;
+        buildHeap();
+    }
 
-	// Decreases key value of key at index i to new_val
-	void decreaseKey(int i, int new_val);
+    public void insert(int item) {
 
-	// Returns the minimum key (key at root) from min heap
-	int getMin() { return harr[0]; }
+        list.add(item);
+        int i = list.size() - 1;
+        int parent = parent(i);
 
-	// Deletes a key stored at index i
-	void deleteKey(int i);
+        while (parent != i && list.get(i) < list.get(parent)) {
 
-	// Inserts a new key 'k'
-	void insertKey(int k);
-};
+            swap(i, parent);
+            i = parent;
+            parent = parent(i);
+        }
+    }
 
-// Constructor: Builds a heap from a given array a[] of given size
-MinHeap::MinHeap(int cap)
-{
-	heap_size = 0;
-	capacity = cap;
-	harr = new int[cap];
+    public void buildHeap() {
+
+        for (int i = list.size() / 2; i >= 0; i--) {
+            minHeapify(i);
+        }
+    }
+
+    public int extractMin() {
+
+        if (list.size() == 0) {
+
+            throw new IllegalStateException("MinHeap is EMPTY");
+        } else if (list.size() == 1) {
+
+            int min = list.remove(0);
+            return min;
+        }
+
+        // remove the last item ,and set it as new root
+        int min = list.get(0);
+        int lastItem = list.remove(list.size() - 1);
+        list.set(0, lastItem);
+
+        // bubble-down until heap property is maintained
+        minHeapify(0);
+
+        // return min key
+        return min;
+    }
+
+    public void decreaseKey(int i, int key) {
+
+        if (list.get(i) < key) {
+
+            throw new IllegalArgumentException("Key is larger than the original key");
+        }
+
+        list.set(i, key);
+        int parent = parent(i);
+
+        // bubble-up until heap property is maintained
+        while (i > 0 && list.get(parent) > list.get(i)) {
+
+            swap(i, parent);
+            i = parent;
+            parent = parent(parent);
+        }
+    }
+
+    private void minHeapify(int i) {
+
+        int left = left(i);
+        int right = right(i);
+        int smallest = -1;
+
+        // find the smallest key between current node and its children.
+        if (left <= list.size() - 1 && list.get(left) < list.get(i)) {
+            smallest = left;
+        } else {
+            smallest = i;
+        }
+
+        if (right <= list.size() - 1 && list.get(right) < list.get(smallest)) {
+            smallest = right;
+        }
+
+        // if the smallest key is not the current key then bubble-down it.
+        if (smallest != i) {
+
+            swap(i, smallest);
+            minHeapify(smallest);
+        }
+    }
+
+    public int getMin() {
+
+        return list.get(0);
+    }
+
+    public boolean isEmpty() {
+
+        return list.size() == 0;
+    }
+
+    private int right(int i) {
+
+        return 2 * i + 2;
+    }
+
+    private int left(int i) {
+
+        return 2 * i + 1;
+    }
+
+    private int parent(int i) {
+
+        if (i % 2 == 1) {
+            return i / 2;
+        }
+
+        return (i - 1) / 2;
+    }
+
+    private void swap(int i, int parent) {
+
+        int temp = list.get(parent);
+        list.set(parent, list.get(i));
+        list.set(i, temp);
+    }
+
 }
-
-// Inserts a new key 'k'
-void MinHeap::insertKey(int k)
-{
-	if (heap_size == capacity)
-	{
-		cout << "\nOverflow: Could not insertKey\n";
-		return;
-	}
-
-	// First insert the new key at the end
-	heap_size++;
-	int i = heap_size - 1;
-	harr[i] = k;
-
-	// Fix the min heap property if it is violated
-	while (i != 0 && harr[parent(i)] > harr[i])
-	{
-	swap(&harr[i], &harr[parent(i)]);
-	i = parent(i);
-	}
-}
-
-// Decreases value of key at index 'i' to new_val. It is assumed that
-// new_val is smaller than harr[i].
-void MinHeap::decreaseKey(int i, int new_val)
-{
-	harr[i] = new_val;
-	while (i != 0 && harr[parent(i)] > harr[i])
-	{
-	swap(&harr[i], &harr[parent(i)]);
-	i = parent(i);
-	}
-}
-
-// Method to remove minimum element (or root) from min heap
-int MinHeap::extractMin()
-{
-	if (heap_size <= 0)
-		return INT_MAX;
-	if (heap_size == 1)
-	{
-		heap_size--;
-		return harr[0];
-	}
-
-	// Store the minimum value, and remove it from heap
-	int root = harr[0];
-	harr[0] = harr[heap_size-1];
-	heap_size--;
-	MinHeapify(0);
-
-	return root;
-}
-
-
-// This function deletes key at index i. It first reduced value to minus
-// infinite, then calls extractMin()
-void MinHeap::deleteKey(int i)
-{
-	decreaseKey(i, INT_MIN);
-	extractMin();
-}
-
-// A recursive method to heapify a subtree with the root at given index
-// This method assumes that the subtrees are already heapified
-void MinHeap::MinHeapify(int i)
-{
-	int l = left(i);
-	int r = right(i);
-	int smallest = i;
-	if (l < heap_size && harr[l] < harr[i])
-		smallest = l;
-	if (r < heap_size && harr[r] < harr[smallest])
-		smallest = r;
-	if (smallest != i)
-	{
-		swap(&harr[i], &harr[smallest]);
-		MinHeapify(smallest);
-	}
-}
-
-// A utility function to swap two elements
-void swap(int *x, int *y)
-{
-	int temp = *x;
-	*x = *y;
-	*y = temp;
-}
-
-// Driver program to test above functions
-int main()
-{
-	MinHeap h(11);
-	h.insertKey(3);
-	h.insertKey(2);
-	h.deleteKey(1);
-	h.insertKey(15);
-	h.insertKey(5);
-	h.insertKey(4);
-	h.insertKey(45);
-	cout << h.extractMin() << " ";
-	cout << h.getMin() << " ";
-	h.decreaseKey(2, 1);
-	cout << h.getMin();
-	return 0;
-}
+#finish
